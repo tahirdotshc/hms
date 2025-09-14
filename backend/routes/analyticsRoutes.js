@@ -1,0 +1,1 @@
+import express from 'express'; import { getSystemStats } from '../controllers/analyticsController.js'; import { protect, dbaOnly } from '../middleware/authMiddleware.js'; const router = express.Router(); router.get('/', protect, dbaOnly, getSystemStats); export default router;
