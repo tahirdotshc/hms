@@ -22,10 +22,11 @@ import PersonIcon from "@mui/icons-material/Person";
 import LockIcon from "@mui/icons-material/Lock";
 import { useNavigate } from "react-router-dom";
 import { useSnackbar } from "notistack";
+import axios from "axios";
 
-import "./LandingPage.css"; // ✅ Animated background
+import "./Login.css"; // ✅ Animated background
 
-export default function LandingPage() {
+export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [remember, setRemember] = useState(false);
   const [userId, setUserId] = useState("");
@@ -41,7 +42,8 @@ export default function LandingPage() {
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
 
-  const handleLogin = (e) => {
+  // ✅ Handle login
+  const handleLogin = async (e) => {
     if (e) e.preventDefault();
 
     let newErrors = { userId: "", password: "" };
@@ -58,20 +60,49 @@ export default function LandingPage() {
 
     setErrors(newErrors);
 
-    if (valid) {
+    if (!valid) {
+      enqueueSnackbar("Please fill all required fields.", { variant: "error" });
+      return;
+    }
+
+    try {
       setLoading(true);
+
+      const res = await axios.post("http://localhost:5000/api/auth/login", {
+        userId,
+        password,
+      });
+
+      const { token, role } = res.data;
+
+      // Store token securely
+      if (remember) {
+        localStorage.setItem("token", token);
+      } else {
+        sessionStorage.setItem("token", token);
+      }
+
       enqueueSnackbar("Login successful! Redirecting...", { variant: "success" });
 
+      // Role-based redirect
       setTimeout(() => {
         setLoading(false);
-        navigate("/dba");
-      }, 1500);
-    } else {
-      enqueueSnackbar("Please fill all required fields.", { variant: "error" });
+        if (role === "DBA") navigate("/dba");
+        else if (role === "Admin") navigate("/admin");
+        else if (role === "Doctor") navigate("/doctor");
+        else if (role === "Dispenser") navigate("/dispenser");
+        else navigate("/patient");
+      }, 1000);
+    } catch (err) {
+      setLoading(false);
+      enqueueSnackbar(err.response?.data?.message || "Invalid credentials", {
+        variant: "error",
+      });
     }
   };
 
-  const handleForgotSubmit = () => {
+  // ✅ Forgot password handler
+  const handleForgotSubmit = async () => {
     if (!forgotEmail.trim()) {
       setForgotError("Email is required");
       return;
@@ -82,10 +113,19 @@ export default function LandingPage() {
       return;
     }
 
-    setForgotError("");
-    enqueueSnackbar("Password reset link sent to your email.", { variant: "info" });
-    setForgotOpen(false);
-    setForgotEmail("");
+    try {
+      await axios.post("http://localhost:4000/api/auth/forgot-password", {
+        email: forgotEmail,
+      });
+      enqueueSnackbar("Password reset link sent to your email.", {
+        variant: "info",
+      });
+      setForgotOpen(false);
+      setForgotEmail("");
+      setForgotError("");
+    } catch (err) {
+      setForgotError(err.response?.data?.message || "Error sending reset email");
+    }
   };
 
   return (
@@ -213,11 +253,7 @@ export default function LandingPage() {
             }}
             disabled={loading}
           >
-            {loading ? (
-              <CircularProgress size={24} color="inherit" />
-            ) : (
-              "Login"
-            )}
+            {loading ? <CircularProgress size={24} color="inherit" /> : "Login"}
           </Button>
         </form>
       </Paper>

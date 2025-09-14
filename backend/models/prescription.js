@@ -1,17 +1,42 @@
 import mongoose from "mongoose";
 
-const prescriptionSchema = new mongoose.Schema({
-  patientId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-  doctorId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-  medicines: [
-    {
-      medicineId: { type: mongoose.Schema.Types.ObjectId, ref: "Medicine" },
-      qty: Number,
+const prescriptionSchema = new mongoose.Schema(
+  {
+    patient: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
     },
-  ],
-  date: { type: Date, default: Date.now },
-  notes: String,
-});
+    doctor: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+    medicines: [
+      {
+        medicine: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "Medicine",
+          required: true,
+        },
+        qty: { type: Number, required: true, min: 1 },
+      },
+    ],
+    status: {
+      type: String,
+      enum: ["Pending", "Dispensed"],
+      default: "Pending",
+    },
+    dispenser: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
+    dispensedFromStore: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Store",
+    },
+  },
+  { timestamps: true }
+);
 
-const Prescription = mongoose.model("Prescription", prescriptionSchema);
-export default Prescription;
+export default mongoose.model("Prescription", prescriptionSchema);

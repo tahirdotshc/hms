@@ -1,1 +1,11 @@
-import express from 'express'; import { createRole, getRoles, updateRole, deleteRole } from '../controllers/roleController.js'; import { protect, dbaOnly } from '../middleware/authMiddleware.js'; const router = express.Router(); router.post('/', protect, dbaOnly, createRole); router.get('/', protect, getRoles); router.put('/:id', protect, dbaOnly, updateRole); router.delete('/:id', protect, dbaOnly, deleteRole); export default router;
+import express from "express";
+import { getRoles } from "../controllers/roleController.js";
+import { protect } from "../middleware/authMiddleware.js";
+import { checkPermission } from "../middleware/permissionMiddleware.js";
+
+const router = express.Router();
+
+// Get all roles
+router.get("/", protect, checkPermission("roles:read"), getRoles);
+
+export default router;

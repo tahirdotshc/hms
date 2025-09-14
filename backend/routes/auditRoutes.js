@@ -1,1 +1,0 @@
-import express from 'express'; import { getAuditLogs } from '../controllers/auditController.js'; import { protect, dbaOnly } from '../middleware/authMiddleware.js'; const router = express.Router(); router.get('/', protect, dbaOnly, getAuditLogs); export default router;

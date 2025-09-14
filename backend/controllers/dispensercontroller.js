@@ -1,5 +1,5 @@
 import Dispensing from "../models/dispensing.js";
-import Medicine from "../models/medicine.js";
+import Medicine from "../models/Medicine.js";
 import Prescription from "../models/prescription.js";
 
 // Dispense medicine from store

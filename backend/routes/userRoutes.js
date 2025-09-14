@@ -1,24 +1,22 @@
 import express from "express";
 import {
-  registerUser,
-  loginUser,
+  getUsers,
   assignRole,
 } from "../controllers/userController.js";
-import {
-  getUsers,
-  softDeleteUser,
-  restoreUser,
-} from "../controllers/userAdminController.js";
+import { protect } from "../middleware/authMiddleware.js";
+import { checkPermission } from "../middleware/permissionMiddleware.js";
 
 const router = express.Router();
 
-router.post("/register", registerUser);
-router.post("/login", loginUser);
-router.put("/assign-role/:id", assignRole);
+// Get all users (DBA/Admin only)
+router.get("/", protect, checkPermission("users:read"), getUsers);
 
-// DBA-only management
-router.get("/", getUsers);
-router.put("/:id/soft-delete", softDeleteUser);
-router.put("/:id/restore", restoreUser);
+// Assign role to user (DBA only)
+router.put(
+  "/:id/assign-role",
+  protect,
+  checkPermission("users:assignRole"),
+  assignRole
+);
 
 export default router;

@@ -1,17 +1,17 @@
 import mongoose from "mongoose";
 
-const medicineSchema = new mongoose.Schema({
-  name: String,
-  description: String,
-  stock: Number,
-  price: Number,
-  store: {
-    type: String,
-    enum: ["judges", "services"],
-    required: true,
+const medicineSchema = new mongoose.Schema(
+  {
+    name: { type: String, required: true },
+    description: { type: String },
+    quantity: { type: Number, required: true, min: 0 },
+    store: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Store",
+      required: true,
+    },
   },
-  expiryDate: Date,
-});
+  { timestamps: true }
+);
 
-const Medicine = mongoose.model("Medicine", medicineSchema);
-export default Medicine;
+export default mongoose.model("Medicine", medicineSchema);
