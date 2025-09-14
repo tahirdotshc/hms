@@ -76,18 +76,21 @@ export default function Login() {
       const { token, role } = res.data;
 
       // Store token securely
-      if (remember) {
-        localStorage.setItem("token", token);
-      } else {
-        sessionStorage.setItem("token", token);
-      }
+     // Store token + role securely
+if (remember) {
+  localStorage.setItem("token", token);
+  localStorage.setItem("role", role);
+} else {
+  sessionStorage.setItem("token", token);
+  sessionStorage.setItem("role", role);
+}
 
       enqueueSnackbar("Login successful! Redirecting...", { variant: "success" });
 
       // Role-based redirect
       setTimeout(() => {
         setLoading(false);
-        if (role === "DBA") navigate("/dba");
+        if (role?.toLowerCase() === "dba") navigate("/dba");
         else if (role === "Admin") navigate("/admin");
         else if (role === "Doctor") navigate("/doctor");
         else if (role === "Dispenser") navigate("/dispenser");
@@ -114,7 +117,7 @@ export default function Login() {
     }
 
     try {
-      await axios.post("http://localhost:4000/api/auth/forgot-password", {
+      await axios.post("http://localhost:5000/api/auth/forgot-password", {
         email: forgotEmail,
       });
       enqueueSnackbar("Password reset link sent to your email.", {

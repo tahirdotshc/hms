@@ -7,13 +7,18 @@ import roleRoutes from "./routes/roleRoutes.js";
 import medicineRoutes from "./routes/medicineRoutes.js";
 import doctorRoutes from "./routes/doctorRoutes.js";
 import dispensaryRoutes from "./routes/dispensaryRoutes.js";
+import cors from "cors";
 
 dotenv.config();
 connectDB();
 
 const app = express();
+
+// middleware
+app.use(cors()); // allow all origins during development
 app.use(express.json());
 
+// routes
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/roles", roleRoutes);

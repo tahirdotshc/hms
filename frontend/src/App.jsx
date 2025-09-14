@@ -27,7 +27,9 @@ const App = () => {
 
 const MainApp = ({ mode, setMode }) => {
   const location = useLocation();
-  const token = localStorage.getItem("token");
+  const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+const role = localStorage.getItem("role") || sessionStorage.getItem("role");
+
 
   const isLoginPage = location.pathname === "/";
 
